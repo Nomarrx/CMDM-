@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>CREATE TABLE Employees (<br>&nbsp; &nbsp; id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; name VARCHAR2(50),<br>&nbsp; &nbsp; salary NUMBER<br>);</p>
+<p></p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (1, 'Ana', 5000);</p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (2, 'Joy', 6000);</p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (3, 'Chris', 4500);</p>
+<p><br>--Create the View<br>CREATE VIEW SalaryView AS<br>SELECT name, salary FROM Employees;</p>
+<p></p>
+<p><br>SELECT * FROM SalaryView;</p>
+<p><br>--Insert a new employee to show view update<br>INSERT INTO Employees (id, name, salary)<br>VALUES (4, 'Diana', 7000);</p>
+<p>SELECT * FROM SalaryView;</p>
+<p>DROP VIEW SalaryView;</p>
+<p>DROP TABLE Employees;</p>
+<p><br>CREATE TABLE Employees (<br>&nbsp; &nbsp; id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; name VARCHAR2(50),<br>&nbsp; &nbsp; salary NUMBER<br>);</p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (1, 'Ana', 5000);</p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (2, 'Joy', 6000);</p>
+<p>INSERT INTO Employees (id, name, salary)<br>VALUES (3, 'Chris', 4500);</p>
+<p></p>
+<p>CREATE OR REPLACE VIEW emp_basic AS<br>SELECT id, name, salary<br>FROM Employees;</p>
+<p>SELECT * FROM emp_basic;</p>
+<p>UPDATE emp_basic<br>SET salary = 6000<br>WHERE name = 'Ana';</p>
+<p>SELECT * FROM emp_basic;</p>
+<h1>View exercises</h1>
+<p>Use the Salespeople/Customers/Orders tables to create the appropriate views. Determine if the views are updateable or not. Justify your response.</p>
+<ol>
+<li>Create a view that shows all of the customers who have the highest rating.</li>
+<li>Create a view that shows the number of salespeople in each city.</li>
+<li>Create a view that shows the average and total orders for each salesperson after his or her name.</li>
+</ol>
+<p></p></body></html>

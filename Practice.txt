@@ -1,0 +1,100 @@
+CREATE TABLE employee (
+emp_id NUMBER(20) PRIMARY KEY,
+ename VARCHAR2(30),
+job_desc VARCHAR2(20),
+salary NUMBER (8)
+);
+
+INSERT INTO employee VALUES(1,'Ram','ADMIN',1000000);
+INSERT INTO employee VALUES(2,'Harini','MANAGER',2500000);
+INSERT INTO employee VALUES(3,'George','SALES',2000000);
+INSERT INTO employee VALUES(4,'Ramya','SALES',1300000);
+INSERT INTO employee VALUES(5,'Meena','HR',2000000);
+INSERT INTO employee VALUES(6,'Ashok','MANAGER',3000000);
+INSERT INTO employee VALUES(7,'Abdul','HR',2000000);
+INSERT INTO employee VALUES(8,'Ramya','ENGINEER',1000000);
+INSERT INTO employee VALUES(9,'Raghu','CEO',8000000);
+INSERT INTO employee VALUES(10,'Arvind','MANAGER',2800000);
+INSERT INTO employee VALUES(11,'Akshay','ENGINEER',1000000);
+INSERT INTO employee VALUES(12,'John','ADMIN',2200000);
+INSERT INTO employee VALUES(13,'Abinaya','ENGINEER',2100000);
+
+Distinct
+
+SELECT DISTINCT job_desc
+FROM employee; -- shows only distinct values without duplicates
+
+SELECT * FROM employee
+WHERE ename = 'Ramya'; 
+
+SELECT emp_id,ename,salary FROM employee
+WHERE salary>2000000; 
+
+SELECT emp_id,ename,salary FROM employee
+WHERE salary<2600000 AND job_desc = 'MANAGER'; 
+
+SELECT * FROM employee
+WHERE job_desc='ADMIN' OR job_desc='HR'; -- though this works next command is a much better choice
+
+SELECT * FROM employee
+WHERE job_desc IN ('ADMIN','HR'); 
+
+SELECT * FROM employee
+WHERE job_desc NOT IN ('MANAGER','CEO');
+
+
+### Using Like and wildcards
+
+LIKE  is used with WHERE clause for searching a specific pattern in a column. It is used along with the following wild cards
+
+% represents zero or more characters
+
+_ represents exactly one character
+
+SELECT * FROM employee
+WHERE ename LIKE 'A%'; -- filters name starting with A
+
+SELECT * FROM employee
+WHERE ename LIKE 'R%a'; -- filters name starting WITH R AND ending with a
+
+SELECT * FROM employee
+WHERE ename LIKE '%I%'; -- filters name containing I
+
+SELECT * FROM employee
+WHERE ename LIKE '__I%'; -- filters name with i as third character
+
+Explanation:
+
+__ → skips the first two characters
+
+I → means the third character must be I
+
+% → allows any number of characters after that
+
+
+
+SELECT * FROM employee
+ORDER BY salary; -- order by salary asc
+
+SELECT * FROM employee
+ORDER BY salary ASC; -- order by salary asc
+
+SELECT * FROM employee
+ORDER BY salary DESC; -- order by salary desc
+
+SELECT * FROM employee
+WHERE job_desc="MANAGER"
+ORDER BY salary DESC; -- order the manager salaries in desc order
+
+SELECT * FROM employee
+ORDER BY job_desc,ename; -- first sorts by job_desc and then by ename
+
+SELECT * FROM employee
+ORDER BY (CASE job_desc -- specific order
+WHEN 'CEO' THEN 1
+WHEN 'MANAGER' THEN 2
+WHEN 'HR' THEN 3
+WHEN 'ANALYST' THEN 4
+WHEN 'SALES' THEN 5
+ELSE 100 END);
+

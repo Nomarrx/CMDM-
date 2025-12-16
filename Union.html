@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>-- create client table similar to branch table<br>CREATE TABLE clients (<br>client_id NUMBER PRIMARY KEY,<br>location VARCHAR(30) NOT NULL,<br>addr VARCHAR(200) );</p>
+<p><br>INSERT INTO clients (client_id, location, addr)<br>VALUES (1, 'NewYork', '25 10th Block');</p>
+<p>INSERT INTO clients (client_id, location, addr)<br>VALUES (2, 'Canada', '120 15th Block');</p>
+<p>INSERT INTO clients (client_id, location, addr)<br>VALUES (3, 'London', '21 ABC Road');</p>
+<p><br>CREATE TABLE branch (<br>&nbsp; &nbsp; branch_id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; location &nbsp;VARCHAR2(30) NOT NULL,<br>&nbsp; &nbsp; addr &nbsp; &nbsp; &nbsp;VARCHAR2(200)<br>);</p>
+<p>INSERT INTO branch (branch_id, location, addr)<br>VALUES (1, 'NewYork', '25 10th Block');</p>
+<p>INSERT INTO branch (branch_id, location, addr)<br>VALUES (2, 'Canada', '120 15th Block');</p>
+<p><br>-- combines the two tables removing duplicates<br>SELECT * FROM branch<br>UNION&nbsp;<br>SELECT * FROM clients;</p>
+<p>-- combines the two tables without removing duplicates<br>SELECT * FROM branch<br>UNION ALL<br>SELECT * FROM clients;</p></body></html>

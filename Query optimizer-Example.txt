@@ -1,0 +1,124 @@
+--LO8 Indexes and Query Optimization
+
+
+--Comparing execution plans
+--use WHERE
+EXPLAIN PLAN SET STATEMENT_ID = 'where1' FOR SELECT * FROM CUSTOMERS;
+
+--to view that plan,  run
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'where1', 'BASICS'));
+
+--DBMS_XPLAN is an Oracle built-in package that displays execution plans.
+
+--DISPLAY() is a function that reads from the PLAN_TABLE and returns the formatted plan.
+
+--compare to another plan
+EXPLAIN PLAN SET STATEMENT_ID = 'where2' FOR SELECT * FROM CUSTOMERS WHERE cnum IN (2001, 2002);
+
+
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'where2', 'TYPICAL'));
+
+--where1 shows Rows ≈ 7 (all customers), Cost - higher.
+
+--where2 shows Rows = 2, Cost = smaller.
+
+--SAME operations, but fewer rows → cheaper.
+
+--COST = Oracle’s rough estimate of how much work the query will take.
+
+--Lower cost = faster plan (usually)
+-- Higher cost = slower plan (usually)
+
+--joins vs multiple queries
+EXPLAIN PLAN SET STATEMENT_ID = 'join1' FOR
+SELECT cname FROM Customers WHERE cnum = 2004; 
+EXPLAIN PLAN SET STATEMENT_ID = 'join2' FOR
+SELECT onum FROM Orders WHERE cnum = 2004;
+--vs:
+EXPLAIN PLAN SET STATEMENT_ID = 'join3' FOR
+SELECT onum, cname FROM CUSTOMERS c JOIN Orders o ON c.cnum = o.cnum WHERE c.cnum = 2004;
+
+--JOIN3 is more efficient than running 2 separate queries, because:
+
+--Oracle finds the customer using the primary key index (very fast).
+
+--Then it scans ORDERS to find matching rows.
+
+--A NESTED LOOP join combines both sets of data.
+
+--indexes
+--BEFORE creating the index
+EXPLAIN PLAN SET STATEMENT_ID = 'index1' FOR
+SELECT * FROM Customers ORDER BY CName;
+
+
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'index1', 'TYPICAL'));
+
+
+--Create the index
+--add an index on cname
+CREATE INDEX cust_name_index ON Customers(CName);
+
+
+--Create the index
+EXPLAIN PLAN SET STATEMENT_ID = 'index2' FOR
+SELECT * FROM Customers ORDER BY CName;
+
+
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'index2', 'TYPICAL'));
+
+
+
+
+
+--where vs having
+EXPLAIN PLAN SET STATEMENT_ID = 'having1' FOR
+SELECT odate, avg(amt) FROM Orders GROUP BY odate HAVING odate IN ('03-OCT-00', '04-OCT-00');
+EXPLAIN PLAN SET STATEMENT_ID = 'having2' FOR
+SELECT odate, avg(amt) FROM Orders WHERE odate IN ('03-OCT-00', '04-OCT-00') GROUP BY odate;
+
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'having1', 'TYPICAL'));
+SELECT *
+FROM TABLE(DBMS_XPLAN.DISPLAY(NULL, 'having2', 'TYPICAL'));
+
+
+--having1 (filter AFTER grouping)
+--Oracle scans every row in ORDERS
+
+--It performs GROUP BY on all odate values
+
+--HAVING filters after grouping
+
+--Cost = higher
+
+--having2 (filter BEFORE grouping)
+--WHERE filters rows before grouping
+
+--Grouping only happens on 2 rows instead of all rows
+
+--Cost = much lower
+
+
+--HAVING1 groups the entire table, then filters → higher cost.
+--HAVING2 filters first using WHERE, then groups fewer rows → lower cost.
+
+
+
+--Exists vs IN
+EXPLAIN PLAN SET STATEMENT_ID = 'exists1' FOR
+SELECT cnum, cname FROM Customers c_outer WHERE EXISTS (SELECT * FROM Orders o WHERE o.cnum = c_outer.cnum);
+--vs
+EXPLAIN PLAN SET STATEMENT_ID = 'exists2' FOR
+SELECT cnum, cname FROM Customers c_outer WHERE cnum IN (SELECT cnum FROM Orders o WHERE o.cnum = c_outer.cnum);
+--vs Using Distinct and a join
+EXPLAIN PLAN SET STATEMENT_ID = 'exists4' FOR
+SELECT DISTINCT c.cnum, c.cname FROM Customers c JOIN Orders o ON c.cnum = o.cnum;
+
+--exists1 is usually cheapest because Oracle uses a SEMI JOIN and stops searching Orders once a match is found.
+--exists2 often costs more because Oracle may build and check a full list of values before filtering.
+--exists4 is typically most expensive because DISTINCT adds an extra HASH UNIQUE step after the join.

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>-- Author table<br>CREATE TABLE Author (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) PRIMARY KEY,<br>&nbsp; auFName VARCHAR2(20),<br>&nbsp; auLName VARCHAR2(40),<br>&nbsp; city &nbsp; &nbsp;VARCHAR2(20),<br>&nbsp; state &nbsp; CHAR(2)<br>);</p>
+<p>-- Title table<br>CREATE TABLE Title (<br>&nbsp; titleID CHAR(6) PRIMARY KEY,<br>&nbsp; title &nbsp; VARCHAR2(80)<br>);</p>
+<p>-- TitleAuthor link table<br>CREATE TABLE TitleAuthor (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) REFERENCES Author(auID),<br>&nbsp; titleID CHAR(6) &nbsp;REFERENCES Title(titleID),<br>&nbsp; auOrder NUMBER,<br>&nbsp; CONSTRAINT TitleAuthor_pk PRIMARY KEY (auID, titleID)<br>);<br>INSERT INTO Author VALUES ('213-46-8915','Marjorie','Green','Oakland','CA');<br>INSERT INTO Author VALUES ('724-08-9931','Dirk','Stringer','Oakland','CA');<br>INSERT INTO Author VALUES ('172-32-1176','David','White','Berkeley','CA');</p>
+<p>INSERT INTO Title &nbsp;VALUES ('BU1032','The Busy Executive''s Database Guide');<br>INSERT INTO Title &nbsp;VALUES ('BU7832','Straight Talk About Computers');<br>INSERT INTO Title &nbsp;VALUES ('BU1111','Cooking with Computers');</p>
+<p>INSERT INTO TitleAuthor VALUES ('213-46-8915','BU1032',1);<br>INSERT INTO TitleAuthor VALUES ('213-46-8915','BU7832',1);<br>INSERT INTO TitleAuthor VALUES ('724-08-9931','BU1111',2);</p>
+<p>COMMIT;</p>
+<p>CREATE OR REPLACE VIEW Oaklanders AS<br>SELECT a.auFName AS First,<br>&nbsp; &nbsp; &nbsp; &nbsp;a.auLName AS Last,<br>&nbsp; &nbsp; &nbsp; &nbsp;t.titleID,<br>&nbsp; &nbsp; &nbsp; &nbsp;t.title<br>FROM Author a<br>JOIN TitleAuthor ta ON a.auID = ta.auID<br>JOIN Title t &nbsp; &nbsp; &nbsp; ON ta.titleID = t.titleID<br>WHERE a.city &nbsp;= 'Oakland'<br>&nbsp; AND a.state = 'CA';</p>
+<p>&nbsp; SELECT * FROM Oaklanders;</p>
+<p><br>SELECT<br>&nbsp; &nbsp; auFName AS First, &nbsp; -- from Author<br>&nbsp; &nbsp; auLName AS Last, &nbsp; &nbsp;-- from Author<br>&nbsp; &nbsp; t.titleID, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-- from Title<br>&nbsp; &nbsp; title &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -- from Title</p>
+<p>“Notice something important:</p>
+<p>Columns from Author: auFName, auLName</p>
+<p>Columns from Title: titleID, title</p>
+<p>No columns from TitleAuthor are directly selected.”</p>
+<p><br>“For a join view to be updateable, Oracle needs:</p>
+<p>A key-preserved table (we have that: TitleAuthor )</p>
+<p>The columns we change must belong to that key-preserved table.”</p>
+<p>If we try to UPDATE First or Last → those belong to Author (not key-preserved) → Oracle says no.</p>
+<p>If we try to UPDATE titleID or title → those belong to Title (not key-preserved) → Oracle says no.</p>
+<p>That’s why UPDATE and INSERT are blocked.</p>
+<p>DELETE FROM Oaklanders<br>WHERE titleID = 'BU1032';</p>
+<p><br>INSERT INTO OAKLANDERS<br>VALUES ('Tanya', 'G', 'PC1233', 'DB is Fun');</p>
+<p>--cannot modify a column which maps to a non key-preserved table</p>
+<p>--View Example 2 (Slightly Modified)</p>
+<p><br>-- 1. Clean start&nbsp;</p>
+<p>DROP VIEW &nbsp; Oaklanders;<br>DROP TABLE &nbsp;TitleAuthor;<br>DROP TABLE &nbsp;Title;<br>DROP TABLE &nbsp;Author;</p>
+<p><br>-- 2. Base tables</p>
+<p>CREATE TABLE Author (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) PRIMARY KEY,<br>&nbsp; auFName VARCHAR2(20),<br>&nbsp; auLName VARCHAR2(40),<br>&nbsp; city &nbsp; &nbsp;VARCHAR2(20),<br>&nbsp; state &nbsp; CHAR(2)<br>);</p>
+<p>CREATE TABLE Title (<br>&nbsp; titleID CHAR(6) PRIMARY KEY,<br>&nbsp; title &nbsp; VARCHAR2(80)<br>);</p>
+<p>CREATE TABLE TitleAuthor (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) REFERENCES Author(auID),<br>&nbsp; titleID CHAR(6) &nbsp;REFERENCES Title(titleID),<br>&nbsp; auOrder NUMBER,<br>&nbsp; CONSTRAINT TitleAuthor_pk PRIMARY KEY (auID, titleID)<br>);</p>
+<p><br>-- 3. Sample data</p>
+<p>INSERT INTO Author VALUES ('213-46-8915','Marjorie','Green','Oakland','CA');<br>INSERT INTO Author VALUES ('724-08-9931','Dirk','Stringer','Oakland','CA');<br>INSERT INTO Author VALUES ('172-32-1176','David','White','Berkeley','CA');</p>
+<p>INSERT INTO Title &nbsp;VALUES ('BU1032','The Busy Executive''s Database Guide');<br>INSERT INTO Title &nbsp;VALUES ('BU7832','Straight Talk About Computers');<br>INSERT INTO Title &nbsp;VALUES ('BU1111','Cooking with Computers');</p>
+<p>-- IMPORTANT: give BU1032 and BU7832 to *different* authors<br>INSERT INTO TitleAuthor VALUES ('213-46-8915','BU1032',1); &nbsp;-- Marjorie → BU1032<br>INSERT INTO TitleAuthor VALUES ('724-08-9931','BU7832',1); &nbsp;-- Dirk &nbsp; &nbsp; → BU7832<br>INSERT INTO TitleAuthor VALUES ('724-08-9931','BU1111',2); &nbsp;-- Dirk &nbsp; &nbsp; → BU1111</p>
+<p>COMMIT;</p>
+<p><br>-- 4. View Example 2<br>-- &nbsp; &nbsp;titleID comes from TitleAuthor</p>
+<p>CREATE OR REPLACE VIEW Oaklanders AS<br>SELECT a.auFName AS First,<br>&nbsp; &nbsp; &nbsp; &nbsp;a.auLName AS Last,<br>&nbsp; &nbsp; &nbsp; &nbsp;ta.titleID, &nbsp; &nbsp; &nbsp; &nbsp;-- &lt;== from TitleAuthor<br>&nbsp; &nbsp; &nbsp; &nbsp;t.title<br>FROM Author a<br>JOIN TitleAuthor ta ON a.auID = ta.auID<br>JOIN Title &nbsp; &nbsp; &nbsp; t &nbsp;ON ta.titleID = t.titleID<br>WHERE a.city &nbsp;= 'Oakland'<br>&nbsp; AND a.state = 'CA';</p>
+<p>-- See what's in the view<br>SELECT * FROM Oaklanders;</p>
+<p>-- 5. UPDATE – should work<br>-- &nbsp; &nbsp;Change BU1032 to BU7832 for Oakland authors</p>
+<p>UPDATE Oaklanders<br>SET titleID = 'BU7832'<br>WHERE titleID = 'BU1032';</p>
+<p>-- Check the effect in the view<br>SELECT * FROM Oaklanders;</p>
+<p>-- Check the effect in the base table<br>SELECT * FROM TitleAuthor<br>WHERE titleID IN ('BU1032','BU7832');</p>
+<p>-- Undo for demo purposes (so you can rerun in class)<br>ROLLBACK;</p>
+<p><br>-- 6. INSERT – should FAIL<br>-- &nbsp; &nbsp;Because view still doesn't have auID (and in book also auOrder)</p>
+<p>INSERT INTO Oaklanders<br>VALUES ('Tanya', 'G', 'PC1233', 'DB is Fun');<br>-- Expect ORA-01779 or similar "cannot modify a column which maps to a non key-preserved table"</p>
+<p></p>
+<p>Now ta.titleID comes directly from TitleAuthor.</p>
+<p>Is this view updateable? &nbsp;YES for UPDATE and DELETE, &nbsp;NO for INSERT</p>
+<p>Why?</p>
+<p>Still key-preserved</p>
+<p>But INSERT still cannot work because TitleAuthor needs both titleID and auOrder.</p>
+<p></p>
+<p><br>--all works<br>-----------------------------------------<br>-- 1. Clean start&nbsp;<br>-----------------------------------------<br>DROP VIEW &nbsp;Oaklanders;<br>DROP TABLE TitleAuthor;<br>DROP TABLE Title;<br>DROP TABLE Author;</p>
+<p>-----------------------------------------<br>-- 2. Base tables<br>-----------------------------------------<br>CREATE TABLE Author (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) PRIMARY KEY,<br>&nbsp; auFName VARCHAR2(20),<br>&nbsp; auLName VARCHAR2(40),<br>&nbsp; city &nbsp; &nbsp;VARCHAR2(20),<br>&nbsp; state &nbsp; CHAR(2)<br>);</p>
+<p>CREATE TABLE Title (<br>&nbsp; titleID CHAR(6) PRIMARY KEY,<br>&nbsp; title &nbsp; VARCHAR2(80)<br>);</p>
+<p>CREATE TABLE TitleAuthor (<br>&nbsp; auID &nbsp; &nbsp;CHAR(11) REFERENCES Author(auID),<br>&nbsp; titleID CHAR(6) &nbsp;REFERENCES Title(titleID),<br>&nbsp; auOrder NUMBER,<br>&nbsp; CONSTRAINT TitleAuthor_pk PRIMARY KEY (auID, titleID)<br>);</p>
+<p>-----------------------------------------<br>-- 3. Sample data<br>-----------------------------------------<br>INSERT INTO Author VALUES ('213-46-8915','Marjorie','Green','Oakland','CA');<br>INSERT INTO Author VALUES ('724-08-9931','Dirk','Stringer','Oakland','CA');<br>INSERT INTO Author VALUES ('172-32-1176','David','White','Berkeley','CA');</p>
+<p>INSERT INTO Title &nbsp;VALUES ('BU1032','The Busy Executive''s Database Guide');<br>INSERT INTO Title &nbsp;VALUES ('BU7832','Straight Talk About Computers');<br>INSERT INTO Title &nbsp;VALUES ('BU1111','Cooking with Computers');</p>
+<p>-- Links (TitleAuthor)<br>INSERT INTO TitleAuthor VALUES ('213-46-8915','BU1032',1); &nbsp;-- Green → BU1032<br>INSERT INTO TitleAuthor VALUES ('724-08-9931','BU7832',1); &nbsp;-- Stringer → BU7832<br>INSERT INTO TitleAuthor VALUES ('724-08-9931','BU1111',2); &nbsp;-- Stringer → BU1111</p>
+<p>COMMIT;</p>
+<p>-----------------------------------------<br>-- 4. VIEW EXAMPLE 3 &nbsp;(INSERT should work)<br>-----------------------------------------<br>CREATE OR REPLACE VIEW Oaklanders AS<br>SELECT<br>&nbsp; &nbsp; ta.auID, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -- from TitleAuthor (key-preserved)<br>&nbsp; &nbsp; a.auFName &nbsp;AS First, &nbsp; &nbsp; -- from Author<br>&nbsp; &nbsp; a.auLName &nbsp;AS Last, &nbsp; &nbsp; &nbsp;-- from Author<br>&nbsp; &nbsp; ta.titleID, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-- from TitleAuthor (key-preserved)<br>&nbsp; &nbsp; t.title, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -- from Title<br>&nbsp; &nbsp; ta.auOrder &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -- from TitleAuthor (key-preserved)<br>FROM Author &nbsp; &nbsp; &nbsp;a<br>JOIN TitleAuthor ta ON a.auID = ta.auID<br>JOIN Title &nbsp; &nbsp; &nbsp; t &nbsp;ON ta.titleID = t.titleID<br>WHERE a.city &nbsp;= 'Oakland'<br>&nbsp; AND a.state = 'CA';</p>
+<p>-- See the view<br>SELECT * FROM Oaklanders;</p>
+<p>-----------------------------------------<br>-- 5. UPDATE through the view (works)<br>-----------------------------------------<br>UPDATE Oaklanders<br>SET auOrder = 5<br>WHERE auID = '724-08-9931'<br>&nbsp; AND titleID = 'BU1111';</p>
+<p>SELECT * FROM Oaklanders<br>WHERE auID = '724-08-9931';</p>
+<p>ROLLBACK; &nbsp;-- undo the change for demos</p>
+<p>-----------------------------------------<br>-- 6. INSERT through the view (now allowed)<br>-- &nbsp; &nbsp;Only columns from the key-preserved table (TitleAuthor)<br>-----------------------------------------<br>INSERT INTO Oaklanders (auID, titleID, auOrder)<br>VALUES ('213-46-8915', 'BU1111', 3); &nbsp;-- Green now also writes BU1111</p>
+<p>-- Check what was inserted in the base table<br>SELECT * FROM TitleAuthor<br>ORDER BY auID, titleID;</p>
+<p>ROLLBACK; &nbsp;-- undo for repeatable demo</p>
+<p>-----------------------------------------<br>-- 7. DELETE through the view (works)<br>-----------------------------------------<br>DELETE FROM Oaklanders<br>WHERE auID = '724-08-9931'<br>&nbsp; AND titleID = 'BU7832';</p>
+<p>-- Check effect<br>SELECT * FROM TitleAuthor<br>ORDER BY auID, titleID;</p>
+<p>ROLLBACK; &nbsp;-- undo again</p>
+<p>View 1 – DELETE only</p>
+<p>View 2 – UPDATE + DELETE</p>
+<p>View 3 – INSERT + UPDATE + DELETE&nbsp;</p>
+<p><br>what is a key-preserved table?</p>
+<p>It is the table on the “many” side of the relationship—here, it is:</p>
+<p>➡ TitleAuthor (because one Author can write many Titles)</p>
+<p>For a view to allow INSERT, UPDATE, or DELETE, it must include enough columns from the key-preserved table.</p>
+<p><br>View 1 — DELETE only<br>Why?</p>
+<p>The view only contains columns from Author and Title, but not the real identifying columns from TitleAuthor.</p>
+<p>So Oracle does not know which exact row in TitleAuthor to modify during UPDATE or INSERT.</p>
+<p><br>View 2 — UPDATE + DELETE<br>Why?</p>
+<p>Now the view includes ta.titleID, which comes from TitleAuthor, our key-preserved table.<br>So Oracle knows which row to update if titleID changes.</p>
+<p>But INSERT still fails because TitleAuthor needs both:</p>
+<p>titleID</p>
+<p>auID</p>
+<p>and also auOrder (part of the key requirement in the table)</p>
+<p>View 3 — INSERT + UPDATE + DELETE work!<br>Why?</p>
+<p>This view now includes all key columns from TitleAuthor.<br>The more key-preserved table columns included in a view,the more update operations become possible.</p></body></html>

@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>-- Displays employee list in Calgary Branch<br>SELECT * FROM employee<br>WHERE branch_id = (SELECT branch_id<br>FROM branch<br>WHERE br_name='Calgary');</p>
+<p>-- Displays the employees with min salary<br>SELECT * FROM employee<br>WHERE salary = (SELECT MIN(salary)<br>FROM employee);</p>
+<p>-- displays the branches containing atleast one admin<br>SELECT branch_id,br_name<br>FROM branch<br>WHERE EXISTS --if satisfied it shows--in subquery atleast 1 row exists--if no,dont show<br>( SELECT * FROM employee<br>WHERE job_desc='ADMIN' AND branch.branch_id = employee.branch_id);</p>
+<p>-- displays the branch info in which any employee gets more than 25L<br>SELECT branch_id,br_name<br>FROM branch<br>WHERE branch_id = ANY<br>(SELECT branch_id FROM employee<br>WHERE salary&gt;2500000);</p></body></html>

@@ -1,0 +1,43 @@
+select * from project;
+select * from employee;
+select * from assignment;
+
+--1
+update project set maxhours = 300 where department = 'Finance';
+--2
+update project set maxhours = maxHours - 25 where maxhours >= 140;
+--3
+update employee set phone = '285-1234' where empnumber = 500;
+--4
+update employee set department = 'Finance' where empnumber = 600;
+--5
+insert into assignment values (1500, 600, 8.5);
+--6
+update assignment set projectid = 1400 where empnumber = 400 AND projectid = 1200;
+--7
+update project set maxhours = maxhours * .75;
+--8
+CREATE TABLE EmpContactMarketing AS SELECT empname, phone FROM Employee WHERE department = 'Marketing';
+SELECT * FROM EmpContactMarketing;
+--9
+DELETE FROM Assignment WHERE empnumber = 300;
+DELETE FROM Employee WHERE empnumber = 300;
+
+drop sequence ex2Sequence;
+drop sequence keySequence;
+
+create sequence ex2Sequence start with 100 increment by -25 cycle minvalue 0 maxvalue 200 nocache;
+create sequence keySequence;
+create table ex2Table(
+  keyCol Number(3) primary key,
+  countCol Number(3)
+);
+
+-- do this 10+ times
+insert into ex2Table values (keySequence.NEXTVAL, ex2Sequence.NEXTVAL);
+
+select * from ex2Table;
+
+drop table ex2Table;
+drop sequence ex2Sequence;
+drop sequence keySequence;

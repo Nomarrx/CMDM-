@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>DROP TABLE Employees;<br>DROP TABLE Employees2;<br>DROP TABLE Departments;</p>
+<p>-- KEY-PRESERVED EXAMPLE</p>
+<p>-- 1. Create Departments table<br>CREATE TABLE Departments (<br>&nbsp; &nbsp; dept_id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; department_name VARCHAR2(50)<br>);</p>
+<p>-- 2. Create Employees table<br>CREATE TABLE Employees (<br>&nbsp; &nbsp; emp_id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; emp_name VARCHAR2(50),<br>&nbsp; &nbsp; dept_id NUMBER REFERENCES Departments(dept_id)<br>);</p>
+<p>-- 3. Insert Departments data<br>INSERT INTO Departments VALUES (1, 'HR');<br>INSERT INTO Departments VALUES (2, 'Finance');<br>INSERT INTO Departments VALUES (3, 'IT');</p>
+<p>-- 4. Insert Employees data (1 employee per department)<br>INSERT INTO Employees VALUES (1, 'John', 1);<br>INSERT INTO Employees VALUES (2, 'Mary', 2);<br>INSERT INTO Employees VALUES (3, 'Mike', 3);</p>
+<p>-- 5. Join Query (Key-Preserved)<br>SELECT e.emp_id, e.emp_name, d.dept_id, d.department_name<br>FROM Employees e<br>JOIN Departments d ON e.dept_id = d.dept_id;</p>
+<p>--No department repeats → Departments is key-preserved</p>
+<p><br>-- NOT KEY-PRESERVED EXAMPLE</p>
+<p>-- 1. (Use same Departments table as before)</p>
+<p>-- 2. Create Employees2 table<br>CREATE TABLE Employees2 (<br>&nbsp; &nbsp; emp_id NUMBER PRIMARY KEY,<br>&nbsp; &nbsp; emp_name VARCHAR2(50),<br>&nbsp; &nbsp; dept_id NUMBER REFERENCES Departments(dept_id)<br>);</p>
+<p>-- 3. Insert Employees2 data (two employees in dept 1)<br>INSERT INTO Employees2 VALUES (1, 'John', 1);<br>INSERT INTO Employees2 VALUES (2, 'Sam', 1);<br>INSERT INTO Employees2 VALUES (3, 'Mary', 2);</p>
+<p>-- 4. Join Query (Not Key-Preserved)<br>SELECT e.emp_id, e.emp_name, d.dept_id, d.department_name<br>FROM Employees2 e<br>JOIN Departments d ON e.dept_id = d.dept_id;</p></body></html>

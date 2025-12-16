@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"><link rel="stylesheet" href="/shared/sp-template/styles/SP-bootstrap-grid.css" data-override="override"></head><body style="color: rgb(32, 33, 34); font-family: verdana, sans-serif; font-size: 12px;"><p>Join Syntax:<br>&nbsp; &nbsp; SELECT selectList<br>&nbsp; &nbsp; FROM table1 JOIN table2 ON condition [JOIN table3 ON condition…]</p>
+<p></p>
+<p><br>DROP TABLE branch CASCADE CONSTRAINTS;<br>DROP TABLE Employee CASCADE CONSTRAINTS;</p>
+<p>CREATE TABLE branch (<br>&nbsp; branch_id NUMBER PRIMARY KEY,<br>&nbsp; br_name VARCHAR2(30) NOT NULL,<br>&nbsp; addr VARCHAR2(200)<br>);</p>
+<p>CREATE TABLE employee (<br>&nbsp; emp_id NUMBER PRIMARY KEY,<br>&nbsp; ename VARCHAR2(30) NOT NULL,<br>&nbsp; job_desc VARCHAR2(20),<br>&nbsp; salary NUMBER,<br>&nbsp; branch_id NUMBER,<br>&nbsp; CONSTRAINT fk_branchid FOREIGN KEY (branch_id)<br>&nbsp; &nbsp; REFERENCES branch(branch_id)<br>);</p>
+<p>SELECT * FROM employee;<br>SELECT * FROM branch;</p>
+<p><br>INSERT INTO branch VALUES (1, 'Regina', '16 ABC Road');<br>INSERT INTO branch VALUES (2, 'Saskatoon', '120 15th Block');<br>INSERT INTO branch VALUES (3, 'Calgary', '25 XYZ Road');<br>INSERT INTO branch VALUES (4, 'Moose Jaw', '32 10th Street');</p>
+<p>INSERT INTO employee VALUES(1,'Ram','ADMIN',1000000,2);<br>INSERT INTO employee VALUES(2,'Harini','MANAGER',2500000,2);<br>INSERT INTO employee VALUES(3,'George','SALES',2000000,1);<br>INSERT INTO employee VALUES(4,'Ramya','SALES',1300000,2);<br>INSERT INTO employee VALUES(5,'Meena','HR',2000000,3);<br>INSERT INTO employee VALUES(6,'Ashok','MANAGER',3000000,1);<br>INSERT INTO employee VALUES(7,'Abdul','HR',2000000,1);<br>INSERT INTO employee VALUES(8,'Ramya','ENGINEER',1000000,2);<br>INSERT INTO employee VALUES(9,'Raghu','CEO',8000000,3);<br>INSERT INTO employee VALUES(10,'Arvind','MANAGER',2800000,3);<br>INSERT INTO employee VALUES(11,'Akshay','ENGINEER',1000000,1);<br>INSERT INTO employee VALUES(12,'John','ADMIN',2200000,1);<br>INSERT INTO employee VALUES(13,'Abinaya','ENGINEER',2100000,2);<br>INSERT INTO employee VALUES(14,'Vidya','ADMIN',2200000,NULL);<br>INSERT INTO employee VALUES(15,'Ranjani','ENGINEER',2100000,NULL);</p>
+<p>--INNER JOIN — employees with their branch<br>SELECT employee.emp_id, employee.ename, employee.job_desc, employee.salary,<br>employee.branch_id, branch.br_name, branch.addr<br>FROM employee<br>INNER JOIN branch ON employee.branch_id = branch.branch_id<br>ORDER BY employee.emp_id;</p>
+<p>-- using table name alias<br>SELECT e.emp_id, e.ename, e.job_desc, e.salary,<br>e.branch_id, b.br_name, b.addr<br>FROM employee e<br>JOIN branch b ON e.branch_id = b.branch_id<br>ORDER BY e.emp_id;</p>
+<p></p>
+<p>-- inner join: only matching rows<br>SELECT employee.emp_id,employee.ename,employee.job_desc,branch.br_name<br>FROM employee<br>INNER JOIN branch<br>ON employee.branch_id=branch.branch_id<br>ORDER BY emp_id;</p>
+<p>-- below query gives same result without using join keyword<br>SELECT employee.emp_id,employee.ename,employee.job_desc,branch.br_name<br>FROM employee,branch<br>WHERE employee.branch_id=branch.branch_id<br>ORDER BY emp_id;</p>
+<p>SELECT employee.emp_id,employee.ename,employee.job_desc,branch.br_name<br>FROM employee<br>RIGHT JOIN branch<br>ON employee.branch_id=branch.branch_id<br>ORDER BY emp_id;</p>
+<p>SELECT employee.emp_id,employee.ename,employee.job_desc,branch.br_name<br>FROM employee<br>LEFT JOIN branch<br>ON employee.branch_id=branch.branch_id<br>ORDER BY emp_id;</p>
+<p><br>--FULL JOIN query Shows every row including null</p>
+<p>SELECT employee.emp_id, employee.ename, employee.job_desc, employee.salary,<br>&nbsp; &nbsp; &nbsp; &nbsp;employee.branch_id, branch.br_name, branch.addr<br>FROM employee<br>FULL JOIN branch ON employee.branch_id = branch.branch_id<br>ORDER BY employee.emp_id;</p>
+<p>-- Cross join joins each row of first table with every other row of second table<br>SELECT employee.emp_id,employee.ename,employee.job_desc,branch.br_name<br>FROM employee<br>CROSS JOIN branch;</p>
+<p>--Join branch and employee tables, group employees by branch name, then count how many employees are in each branch.</p>
+<p>-- displays the employee count in each branch</p>
+<p>SELECT branch.br_name, COUNT(employee.emp_id)<br>FROM branch<br>JOIN employee<br>ON branch.branch_id = employee.branch_id<br>GROUP BY branch.br_name;</p>
+<p><br>--If you want to include branches with zero employees (ex: Moose Jaw)</p>
+<p>SELECT branch.br_name, COUNT(employee.emp_id)<br>FROM branch<br>LEFT JOIN employee<br>ON branch.branch_id = employee.branch_id<br>GROUP BY branch.br_name;</p>
+<p>--Filters &nbsp;High-paid employees (&gt; 2,500,000), with branch name</p>
+<p><br>SELECT employee.emp_id,<br>&nbsp; &nbsp; &nbsp; &nbsp;employee.ename,<br>&nbsp; &nbsp; &nbsp; &nbsp;employee.salary,<br>&nbsp; &nbsp; &nbsp; &nbsp;branch.br_name<br>FROM employee<br>LEFT JOIN branch<br>ON employee.branch_id = branch.branch_id<br>WHERE employee.salary &gt; 2500000<br>ORDER BY employee.ename;</p>
+<p>-----Aggregations with JOINs<br>--Employees per branch (include zero):</p>
+<p>SELECT b.br_name, COUNT(e.emp_id) AS emp_count<br>FROM branch b<br>LEFT JOIN employee e ON e.branch_id = b.branch_id<br>GROUP BY b.br_name<br>ORDER BY b.br_name;</p>
+<p>--not include zero<br>SELECT b.br_name, COUNT(e.emp_id) AS emp_count<br>FROM branch b<br>JOIN employee e ON e.branch_id = b.branch_id<br>GROUP BY b.br_name<br>ORDER BY b.br_name;</p>
+<p>--Total salary per branch (include zero):<br>SELECT b.br_name, NVL(SUM(e.salary),0) AS total_salary<br>FROM branch b<br>LEFT JOIN employee e ON e.branch_id = b.branch_id<br>GROUP BY b.br_name<br>ORDER BY b.br_name;</p>
+<p>--Only branches with total salary &gt; 3,000,000<br>SELECT b.br_name, SUM(e.salary) AS total_salary<br>FROM branch b<br>JOIN employee e ON e.branch_id = b.branch_id<br>GROUP BY b.br_name<br>HAVING SUM(e.salary) &gt; 3000000<br>ORDER BY total_salary DESC;</p></body></html>

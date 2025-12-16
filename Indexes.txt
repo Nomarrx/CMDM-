@@ -1,0 +1,54 @@
+--View indexes:
+SELECT * FROM USER_INDEXES;
+
+SELECT index_name, table_name
+FROM USER_INDEXES;
+
+SELECT index_name, table_name, uniqueness, index_type
+FROM user_indexes
+WHERE table_name IN ('PROJECT', 'EMPLOYEE', 'ASSIGNMENT')
+ORDER BY table_name, index_name;
+
+
+--syntax
+--CREATE INDEX index_name ON table_name(column_name);
+
+--Create a basic (single-column) index
+CREATE INDEX emp_phone_index ON Employee(phone);
+
+--Check indexes created → USER_INDEXES
+SELECT index_name, table_name, uniqueness, index_type
+FROM user_indexes
+WHERE table_name = 'EMPLOYEE';
+
+
+--Check which column(s) the index uses → USER_IND_COLUMNS
+SELECT index_name, column_name, column_position
+FROM user_ind_columns
+WHERE index_name = 'EMP_PHONE_INDEX';
+
+
+--Composite Index (Multi-Column Index)
+--An index on more than one column.
+
+
+CREATE INDEX emp_dept_name_index 
+ON Employee(department, empName);
+
+--Check that the index exists → USER_INDEXES
+SELECT index_name, table_name, uniqueness, index_type
+FROM user_indexes
+WHERE index_name = 'EMP_DEPT_NAME_INDEX';
+
+--Check the indexed columns → USER_IND_COLUMNS
+SELECT index_name, column_name, column_position
+FROM user_ind_columns
+WHERE index_name = 'EMP_DEPT_NAME_INDEX'
+ORDER BY column_position;
+
+
+--Function-Based Index
+
+CREATE UNIQUE INDEX emp_name_upper_index 
+ON Employee(UPPER(empName));
+

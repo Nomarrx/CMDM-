@@ -1,0 +1,60 @@
+DROP TABLE Repair CASCADE CONSTRAINTS;
+DROP TABLE Equipment_Repair CASCADE CONSTRAINTS;
+DROP TABLE Item CASCADE CONSTRAINTS;
+DROP TABLE ItemRepair CASCADE CONSTRAINTS;
+
+
+/* Part 1 and 2*/
+
+CREATE TABLE Repair (
+	itemNumber NUMBER(4),
+	type VARCHAR2(20),
+	acquisitionCost NUMBER(8,2),
+	repairNumber NUMBER(4),
+	repairDate DATE,
+	repairAmount NUMBER(7,2)
+	);
+
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(100, 'Drill Press', 3500, 2000, '5-may-04', 375);
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(200, 'Lathe', 4750, 2100, '7-may-04', 255);
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(100, 'Drill Press', 3500, 2200, '19-may-04', 178);
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(300, 'Mill', 27300, 2300, '19-may-04', 1785);
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(100, 'Drill Press', 3500, 2400, '11-may-04', 0);
+INSERT INTO Repair (itemNumber, type, acquisitionCost, repairNumber, repairDate, repairAmount)
+		Values(100, 'Drill Press', 3500, 2600, '1-jun-04', 275);
+
+COMMIT;
+
+
+
+/* Part 3. The creation of the two tables. */
+
+CREATE TABLE Item(
+    itemNumber NUMBER(4) CONSTRAINT Item_itemNumber_pk PRIMARY KEY,
+    type VARCHAR2(20),
+    acquisitionCost NUMBER(8,2)
+    );
+
+CREATE TABLE ItemRepair(
+    repairNumber NUMBER(4) 
+          CONSTRAINT ItemRepair_repairNumber_pk PRIMARY KEY,
+    repairDate DATE,
+    repairAmount NUMBER(8,2),
+    itemNumber NUMBER(4) 
+        CONSTRAINT ItemRepair_itemNumber_fk 
+        REFERENCES Item(itemNumber)
+    );
+
+
+
+
+COMMIT;
+
+
+
+
